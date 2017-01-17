@@ -1,14 +1,64 @@
 package com.example.dm2.contentproviders;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
-public class Dialogo extends AppCompatActivity {
-    
+
+public class Dialogo extends DialogFragment {
+
+    private EditText cliente;
+    private EditText telefono;
+    private EditText email;
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dialogo);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.activity_dialogo, null);
+
+        builder.setView(v);
+
+        Button but= (Button) v.findViewById(R.id.butConfirmar);
+
+        /*cliente = (EditText)v.findViewById(R.id.cliente);
+        telefono = (EditText)v.findViewById(R.id.telefono);
+        email = (EditText)v.findViewById(R.id.email);*/
+        but.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cliente = (EditText)v.findViewById(R.id.cliente);
+                telefono = (EditText)v.findViewById(R.id.telefono);
+                email = (EditText)v.findViewById(R.id.email);
+
+                String cli=cliente.getText().toString();
+                String tel=telefono.getText().toString();
+                String mail=email.getText().toString();
+
+                Intent intent=new Intent(Dialogo.this.getActivity(),MainActivity.class);
+                intent.putExtra("cliente",cli);
+                intent.putExtra("telefono",tel);
+                intent.putExtra("email",mail);
+
+                startActivity(intent);
+
+
+            }
+        });
+        return builder.create();
     }
 }

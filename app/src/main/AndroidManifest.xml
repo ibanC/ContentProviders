@@ -20,7 +20,6 @@
             android:name=".ClientesProvider"
             android:authorities="com.example.dm2.contentproviders" />
 
-        <activity android:name=".Dialogo"></activity>
     </application>
 
 </manifest>

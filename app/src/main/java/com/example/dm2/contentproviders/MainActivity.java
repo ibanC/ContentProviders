@@ -19,6 +19,9 @@ public class MainActivity extends Activity {
     private Button btnConsultar;
     private Button btnEliminar;
     private TextView txtResultados;
+    private String cliente;
+    private String telefono;
+    private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,11 @@ public class MainActivity extends Activity {
         btnConsultar = (Button)findViewById(R.id.BtnConsultar);
         btnInsertar = (Button)findViewById(R.id.BtnInsertar);
         btnEliminar = (Button)findViewById(R.id.BtnEliminar);
+
+        Bundle extras=getIntent().getExtras();
+        cliente = extras.getString("cliente");
+        telefono = extras.getString("telefono");
+        email = extras.getString("email");
 
         btnConsultar.setOnClickListener(new OnClickListener() {
 
@@ -85,10 +93,12 @@ public class MainActivity extends Activity {
             public void onClick(View arg0) {
                 ContentValues values = new ContentValues();
 
+                Dialogo d=new Dialogo();
+
                 
-                values.put(ClientesProvider.Clientes.COL_NOMBRE, "ClienteN");
-                values.put(ClientesProvider.Clientes.COL_TELEFONO, "999111222");
-                values.put(ClientesProvider.Clientes.COL_EMAIL, "nuevo@email.com");
+                values.put(ClientesProvider.Clientes.COL_NOMBRE, cliente);
+                values.put(ClientesProvider.Clientes.COL_TELEFONO, telefono);
+                values.put(ClientesProvider.Clientes.COL_EMAIL, email);
 
                 ContentResolver cr = getContentResolver();
 
