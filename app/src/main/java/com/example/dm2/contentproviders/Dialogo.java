@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 
-public class Dialogo extends DialogFragment {
+public class Dialogo extends AppCompatActivity {
 
     private EditText cliente;
     private EditText telefono;
@@ -23,17 +23,13 @@ public class Dialogo extends DialogFragment {
 
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dialogo);
 
-        View v = inflater.inflate(R.layout.activity_dialogo, null);
-
-        builder.setView(v);
-
-        Button but= (Button) v.findViewById(R.id.butConfirmar);
+        Button but= (Button) findViewById(R.id.butConfirmar);
 
         /*cliente = (EditText)v.findViewById(R.id.cliente);
         telefono = (EditText)v.findViewById(R.id.telefono);
@@ -41,24 +37,23 @@ public class Dialogo extends DialogFragment {
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cliente = (EditText)v.findViewById(R.id.cliente);
-                telefono = (EditText)v.findViewById(R.id.telefono);
-                email = (EditText)v.findViewById(R.id.email);
+                cliente = (EditText)findViewById(R.id.cliente);
+                telefono = (EditText)findViewById(R.id.telefono);
+                email = (EditText)findViewById(R.id.email);
 
                 String cli=cliente.getText().toString();
                 String tel=telefono.getText().toString();
                 String mail=email.getText().toString();
 
-                Intent intent=new Intent(Dialogo.this.getActivity(),MainActivity.class);
+                Intent intent=new Intent(Dialogo.this,MainActivity.class);
                 intent.putExtra("cliente",cli);
                 intent.putExtra("telefono",tel);
                 intent.putExtra("email",mail);
-
-                startActivity(intent);
+                setResult(RESULT_OK,intent);
+                finish();
 
 
             }
         });
-        return builder.create();
     }
 }

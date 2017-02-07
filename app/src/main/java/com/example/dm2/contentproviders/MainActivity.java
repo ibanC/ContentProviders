@@ -1,17 +1,20 @@
 package com.example.dm2.contentproviders;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CallLog.Calls;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -22,6 +25,7 @@ public class MainActivity extends Activity {
     private String cliente;
     private String telefono;
     private String email;
+    private ContentResolver cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +38,7 @@ public class MainActivity extends Activity {
         btnInsertar = (Button)findViewById(R.id.BtnInsertar);
         btnEliminar = (Button)findViewById(R.id.BtnEliminar);
 
-        Bundle extras=getIntent().getExtras();
-        cliente = extras.getString("cliente");
-        telefono = extras.getString("telefono");
-        email = extras.getString("email");
+
 
         btnConsultar.setOnClickListener(new OnClickListener() {
 
@@ -60,7 +61,6 @@ public class MainActivity extends Activity {
                         null,       //Condición de la query
                         null,       //Argumentos variables de la query
                         null);      //Orden de los resultados
-
                 if (cur.moveToFirst())
                 {
                     String nombre;
@@ -91,18 +91,10 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                ContentValues values = new ContentValues();
 
-                Dialogo d=new Dialogo();
 
-                
-                values.put(ClientesProvider.Clientes.COL_NOMBRE, cliente);
-                values.put(ClientesProvider.Clientes.COL_TELEFONO, telefono);
-                values.put(ClientesProvider.Clientes.COL_EMAIL, email);
-
-                ContentResolver cr = getContentResolver();
-
-                cr.insert(ClientesProvider.CONTENT_URI, values);
+                Intent intent=new Intent(MainActivity.this,Dialogo.class);
+                startActivityForResult(intent,1);
             }
         });
 
@@ -110,43 +102,70 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                ContentResolver cr = getContentResolver();
+                cr = getContentResolver();
 
-                cr.delete(ClientesProvider.CONTENT_URI, ClientesProvider.Clientes.COL_NOMBRE + " = 'ClienteN'", null);
+
+                AlertDialog.Builder alertDialog1 = new AlertDialog.Builder(MainActivity.this);
+
+                alertDialog1.setTitle("Eliminar cliente");
+                alertDialog1.setView(R.layout.activity_eliminar_usuario);
+                //columnas de la tabla a recuperar
+
+                String[] projection=new String[]{
+                        ClientesProvider.Clientes._ID,
+                        ClientesProvider.Clientes.COL_NOMBRE};
+                Uri clientesUri=ClientesProvider.CONTENT_URI;
+
+                //hacemos la consulta
+                final Cursor c= cr.query(clientesUri,projection,null,null,null);
+                alertDialog1.setMultiChoiceItems(c,ClientesProvider.Clientes.COL_NOMBRE,ClientesProvider.Clientes.COL_NOMBRE, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if(isChecked)
+                        {
+                            /*cr.delete(ClientesProvider.CONTENT_URI,ClientesProvider.Clientes.COL_NOMBRE+"='"+
+                                    c.getString(which)+"'",null);*/
+                            Toast.makeText(MainActivity.this,c.getType(which)+" eliminado",Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+
+                        }
+                    }
+                });
+               /* if(c.moveToFirst())
+                {
+                    String nombre;
+
+
+                    int colNombre=c.getColumnIndex(ClientesProvider.Clientes.COL_NOMBRE);
+
+
+                    do{
+                        nombre=c.getString(colNombre);
+                        adaptador.add(nombre);
+                    }while(c.moveToNext());
+                }*/
+
+                alertDialog1.create().show();
+
             }
         });
 
-        //columnas de la tabla a recuperar
-
-        String[] projection=new String[]{
-                ClientesProvider.Clientes._ID,
-                ClientesProvider.Clientes.COL_NOMBRE,
-                ClientesProvider.Clientes.COL_TELEFONO,
-                ClientesProvider.Clientes.COL_EMAIL};
-        Uri clientesUri=ClientesProvider.CONTENT_URI;
-        ContentResolver cr=getContentResolver();
-
-        //hacemos la consulta
-        Cursor c=cr.query(clientesUri,projection,null,null,null);
-        if(c.moveToFirst())
+    }
+    protected void onActivityResult(int requestCode,int resultCode,Intent data)
+    {
+        if(requestCode==1&&resultCode==RESULT_OK)
         {
-            String nombre;
-            String telefono;
-            String email;
+            cliente = data.getExtras().getString("cliente");
+            telefono =data.getExtras().getString("telefono");
+            email = data.getExtras().getString("email");
+            ContentValues values = new ContentValues();
+            values.put(ClientesProvider.Clientes.COL_NOMBRE, cliente);
+            values.put(ClientesProvider.Clientes.COL_TELEFONO, telefono);
+            values.put(ClientesProvider.Clientes.COL_EMAIL, email);
 
-            int colNombre=c.getColumnIndex(ClientesProvider.Clientes.COL_NOMBRE);
-            int colTelefono=c.getColumnIndex(ClientesProvider.Clientes.COL_TELEFONO);
-            int colEmail=c.getColumnIndex(ClientesProvider.Clientes.COL_EMAIL);
+            ContentResolver cr = getContentResolver();
 
-            txtResultados.setText("");
-
-            do{
-                nombre=c.getString(colNombre);
-                telefono=c.getString(colTelefono);
-                email=c.getString(colEmail);
-                txtResultados.append(nombre+"-"+telefono+"-"+email+"\n");
-            }while(c.moveToNext());
+            cr.insert(ClientesProvider.CONTENT_URI, values);
         }
-
     }
 }
