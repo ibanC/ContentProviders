@@ -105,7 +105,7 @@ public class MainActivity extends Activity {
                 cr = getContentResolver();
 
 
-                AlertDialog.Builder alertDialog1 = new AlertDialog.Builder(MainActivity.this);
+                final AlertDialog.Builder alertDialog1 = new AlertDialog.Builder(MainActivity.this);
 
                 alertDialog1.setTitle("Eliminar cliente");
                 alertDialog1.setView(R.layout.activity_eliminar_usuario);
@@ -117,20 +117,23 @@ public class MainActivity extends Activity {
                 Uri clientesUri=ClientesProvider.CONTENT_URI;
 
                 //hacemos la consulta
+
                 final Cursor c= cr.query(clientesUri,projection,null,null,null);
+
                 alertDialog1.setMultiChoiceItems(c,ClientesProvider.Clientes.COL_NOMBRE,ClientesProvider.Clientes.COL_NOMBRE, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if(isChecked)
                         {
-                            /*cr.delete(ClientesProvider.CONTENT_URI,ClientesProvider.Clientes.COL_NOMBRE+"='"+
-                                    c.getString(which)+"'",null);*/
+                            c.moveToFirst();
+                            cr.delete(ClientesProvider.CONTENT_URI,ClientesProvider.Clientes.COL_NOMBRE+"='"+
+                                    c.getString(which)+"'",null);
                             Toast.makeText(MainActivity.this,c.getType(which)+" eliminado",Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
-
+                            dialog.cancel();
                         }
                     }
                 });
+                alertDialog1.create().show();
                /* if(c.moveToFirst())
                 {
                     String nombre;
@@ -144,8 +147,6 @@ public class MainActivity extends Activity {
                         adaptador.add(nombre);
                     }while(c.moveToNext());
                 }*/
-
-                alertDialog1.create().show();
 
             }
         });
